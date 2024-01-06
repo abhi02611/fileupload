@@ -83,7 +83,7 @@ export const signIn = async (req, res, next) => {
       },
       process.env.TOKEN_SECRET_KEY,
       {
-        expiresIn: "1h",
+        expiresIn: "1d",
       }
     );
 
@@ -94,7 +94,7 @@ export const signIn = async (req, res, next) => {
       .status(200)
       .json({success: true, data: userInfo});
   } catch (error) {
-    next(err);
+    next(error);
   }
 };
 
