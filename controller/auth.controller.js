@@ -57,7 +57,13 @@ export const signIn = async (req, res, next) => {
   try {
     const validateUser = await User.findOne({ email });
     if (!validateUser) {
-      res.status(201).json("User is created successfully");
+      res.status(400).json({ success: false, message: "User not found" });
+    }
+
+    if(validateUser && !validateUser.isActive){
+       res
+         .status(400)
+         .json({ success: false, message: "User is not approved by admin" }); 
     }
 
     const validPassword = bcryptjs.compareSync(password, validateUser.password);
