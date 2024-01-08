@@ -33,7 +33,7 @@ export const signUp = async (req, res, next) => {
     sendMail(
       "System Generated",
       "codasphere@gmail.com",
-      "abhibajaj622@gmail.com",
+      process.env.ADMIN_EMAIL,
       email
     );
     
