@@ -4,14 +4,27 @@ import User from "../models/user.js";
 import Listing from "../models/listing.js";
 
 export const getUserById = async (req, res, next) => {
+  const loggedInUser = req.user;
+  if(!loggedInUser.isAdmin){
+    return res.status(401).json({ message: "User is not an admin user" });
+  }
+  const { userId } = req.query;
+  let result = null;
   try {
-    const user = await User.findById(req.params.id);
-
-    if (!user) return next(errorHandler(404, "User not found!"));
-
-    const { password: pass, ...rest } = user._doc;
-
-    res.status(200).json({ success: true, data: rest });
+    if(userId) {
+      const user = await User.findById(userId);
+      const { password: pass, ...rest } = user._doc;
+      result = rest;
+    } else {
+      const users = await User.find();
+      users.map(user => {
+         const { password: pass, ...rest } = user._doc;
+         return rest;
+      })
+      result = users;
+    }
+    if (!result) return next(errorHandler(404, "User not found!"));
+    res.status(200).json({ success: true, data: result });
   } catch (error) {
     next(error);
   }

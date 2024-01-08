@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
-app.use(morgan("combined", { stream: accessLogStream }));
+app.use(morgan("tiny"));
 //render static files
 console.log(__dirname);
 console.log(path.join(__dirname, "/public/images"))
