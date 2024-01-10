@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendMail } from "../utils/mail.js";
+import { errorHandler } from "../utils/error.js"
 
 export const signUp = async (req, res, next) => {
   const { email, password } = req.body;
