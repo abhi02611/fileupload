@@ -98,7 +98,7 @@ export const deleteUser = async (req, res, next) => {
     return next(errorHandler(401, "You are not authorized"));
   try {
     await User.findByIdAndDelete(userId);
-    res.clearCookie("access_token");
+    //res.clearCookie("access_token");
     res.status(200).json("user has been deleted successfully");
   } catch (err) {
     next(err);
