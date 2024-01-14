@@ -5,22 +5,22 @@ import Listing from "../models/listing.js";
 
 export const getUserById = async (req, res, next) => {
   const loggedInUser = req.user;
-  if(!loggedInUser.isAdmin){
+  if (!loggedInUser.isAdmin) {
     return res.status(401).json({ message: "User is not an admin user" });
   }
   const { userId } = req.query;
   let result = null;
   try {
-    if(userId) {
+    if (userId) {
       const user = await User.findById(userId);
       const { password: pass, ...rest } = user._doc;
       result = rest;
     } else {
       const users = await User.find();
-      users.map(user => {
-         const { password: pass, ...rest } = user._doc;
-         return rest;
-      })
+      users.map((user) => {
+        const { password: pass, ...rest } = user._doc;
+        return rest;
+      });
       result = users;
     }
     if (!result) return next(errorHandler(404, "User not found!"));
@@ -31,18 +31,36 @@ export const getUserById = async (req, res, next) => {
 };
 
 export const getUserListings = async (req, res, next) => {
-  if (req.user.id === req.params.id) {
-    try {
-      const listings = await Listing.find({ userId: req.params.id });
-      res.status(200).json(listings);
-    } catch (error) {
-      next(error);
-    }
-  } else {
+  if (!req.user.isAdmin && req.user.id !== req.params.id) {
     return next(errorHandler(401, "You can only view your own listings!"));
   }
-};
+  let user = null;
+  try {
+    const listings = await Listing.find({ userId: req.params.id });
+    let result = null;
+    if (req.user.isAdmin) {
+      const userId = req.params.id;
+      user = await User.findById(userId);
+      result = {
+        id: user._id,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        isActive: user.isActive,
+        status: user.status,
+        listing: listings,
+      };
+    } else {
+      result = listings;
+    }
 
+    res.status(200).json({
+      message: "sucess",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const updateUser = async (req, res, next) => {
   const userId = req.params.id;
@@ -61,7 +79,7 @@ export const updateUser = async (req, res, next) => {
       {
         $set: {
           status: req.body.status,
-          isActive: req.body.status === "APPROVED" ? true : false
+          isActive: req.body.status === "APPROVED" ? true : false,
         },
       },
       { new: true }
@@ -86,6 +104,3 @@ export const deleteUser = async (req, res, next) => {
     next(err);
   }
 };
-
-
-

@@ -16,7 +16,7 @@ export const createListing = async (req, res, next) => {
   const images = req.files;
   if (images && images.length > 0) {
     imageUrls = images.map((image) => {
-      return "/static/" +image.path.split("/")[2];
+      return image.location;
     });
   }
 
